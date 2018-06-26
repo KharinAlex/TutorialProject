@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="/admin/">My Site</a>
+    </div>
+    <ul class="nav navbar-nav">
+      <li {% if 'home' in request.path %}class="active"{% endif %}><a href="/home/">Home</a></li>
+      <li {% if 'news' in request.path %}class="active"{% endif %}><a href="/news/">News</a></li>
+      <li {% if 'media' in request.path %}class="active"{% endif %}><a href="/media/">Media</a></li>
+      <li {% if 'about' in request.path %}class="active"{% endif %}><a href="/about/">About us</a></li>
+    </ul>
+  </div>
+</nav>
+{% block content %}
+{% endblock %}
+</body>
+</html>
