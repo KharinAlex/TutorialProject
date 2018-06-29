@@ -18,17 +18,6 @@
       <li {% if 'media' in request.path %}class="active"{% endif %}><a href="/media/">Media</a></li>
       <li {% if 'about' in request.path %}class="active"{% endif %}><a href="/about/">About us</a></li>
     </ul>
-    <div class="nav navbar-nav navbar-right">
-      {% if user.is_authenticated %}
-        <form action="/auth/logout/">
-          <button class="btn btn-primary navbar-btn">Log out</button>
-        </form>
-      {% else %}
-        <form action="/auth/login/">
-          <button class="btn btn-primary navbar-btn">Sign In</button>
-        </form>
-      {% endif%}
-    </div>
   </div>
 </nav>
 {% block content %}
