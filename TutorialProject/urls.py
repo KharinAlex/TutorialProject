@@ -22,4 +22,5 @@ urlpatterns = [
     path('home/', include('HomePage.urls')),
     path('news/', include('News.urls')),
     path('media/', include('Media.urls')),
+    path('auth/', include('SignIn.urls')),
 ]

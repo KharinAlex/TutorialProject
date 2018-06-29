@@ -3,6 +3,9 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = 'bf)+3-6)*nr$+-$n8+_zo)!f$b#gfbf2dc0qs8%$zw+x@sfrrm'
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -21,6 +24,7 @@ INSTALLED_APPS = [
     'HomePage',
     'Media',
     'News',
+    'SignIn',
 ]
 
 MIDDLEWARE = [
@@ -33,7 +37,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'mySite.urls'
+ROOT_URLCONF = 'TutorialProject.urls'
 
 TEMPLATES = [
     {
@@ -51,7 +55,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'mySite.wsgi.application'
+WSGI_APPLICATION = 'TutorialProject.wsgi.application'
 
 
 # Database
