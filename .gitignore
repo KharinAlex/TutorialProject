@@ -1,8 +1,3 @@
 *.cpython-35.pyc
-TutorialProject/__pycache__/
-SignIn/migrations/__pycache__/
-SignIn/__pycache__/
-News/__pycache__/
-Media/__pycache__/
-HomePage/__pycache__/
 .idea/
+

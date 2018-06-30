@@ -4,7 +4,7 @@
 <div class="container">
   <div class="jumbotron">
 <h3 class="test-info" align="center">{{article.Title}}</h3>
-<h5 class="test-info">Published: {{article.Date|date:"y-m-d h-m-s"}} by {{article.Author}}</h5>
+<h5 class="test-info">Published: {{article.Date|date:"y-m-d h:m:s"}} by {{article.Author}}</h5>
 {{article.Content|safe|linebreaks}}
   </div>
 </div>
