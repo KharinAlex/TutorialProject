@@ -4,5 +4,11 @@
 {% extends "HomePage/wrapper.html" %}
 
 {% block content %}
-<p>Its News page text</p>
+{% for post in object_list%}
+  <div class="well">
+      <a href="{{post.id}}"><h3>{{post.Title}}</h3></a>
+      <h5>{{post.Date|date:"d-m-y"}}</h5>
+      <h5>{{post.Author}}</h5>
+  </div>
+{% endfor %}
 {% endblock %}
