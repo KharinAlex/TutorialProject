@@ -1,3 +1,11 @@
 *.cpython-35.pyc
 .idea/
-
+TutorialProject/__pycache__/
+SignIn/__pycache__/
+SignIn/migrations/__pycache__/
+News/__pycache__/
+News/migrations/__pycache__/
+Media/__pycache__/
+Media/migrations/__pycache__/
+HomePage/__pycache__/
+HomePage/migrations/__pycache__/
