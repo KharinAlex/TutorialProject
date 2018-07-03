@@ -5,27 +5,22 @@
 </head>
 
 {% extends "HomePage/wrapper.html" %}
-{% load staticfiles %}
 
 {% block content %}
 <div class="container">
-  <h2>Random carousel</h2>
+    <h2>Random carousel <a href="{% url 'image_upload' %}" class="top-menu"><span class="glyphicon glyphicon-plus"></span></a></h2>
   <div id="myCarousel" class="carousel slide" data-ride="carousel">
 
     <ol class="carousel-indicators">
-      <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
-      <li data-target="#myCarousel" data-slide-to="1"></li>
-      <li data-target="#myCarousel" data-slide-to="2"></li>
+        {% for image in imagesContent %}
+          <li data-target="#myCarousel" data-slide-to={{forloop.counter0}}  {% if forloop.first %} class="active"> {% endif %}</li>
+        {% endfor %}
     </ol>
 
     <!-- Wrapper for slides -->
     <div class="carousel-inner">
        {% for image in imagesContent %}
-        {% if forloop.first %}
-          <div class="item active">
-        {% else %}
-          <div class="item">
-        {% endif %}
+         <div {% if forloop.first %}class="item active"{% else %}class="item"{% endif %}>
            <img src ="{{image}}" style="width:100%;height:650">
          </div>
        {% endfor %}

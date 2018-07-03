@@ -1,17 +1,19 @@
-from django.shortcuts import render, render_to_response
-from django.urls import reverse
-from django.http import HttpResponseRedirect
-from .models import UploadImageForm, UploadImage
+from django.shortcuts import render, redirect
+from .models import UploadImage
+from .forms import UploadImageForm
 
-def media_upload(request):
+
+def image_upload(request):
     if request.method == "POST":
         form = UploadImageForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            return HttpResponseRedirect(reverse('media-list'))
+            return redirect('media_main')
+        else:
+            return redirect('/')
     else:
         form = UploadImageForm()
-    return render_to_response('Media/media.html', {'form': form})
+    return render(request, 'Media/mediaupload.html', {'form': form})
 
 def index(request):
-    return render(request, 'Media/media.html', {'imagesContent': UploadImage.objects.all})
+    return render(request, 'Media/media.html', {'imagesContent': UploadImage.objects.order_by("id")[:6]})

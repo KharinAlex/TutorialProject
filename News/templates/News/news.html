@@ -5,10 +5,14 @@
 
 {% block content %}
 {% for post in object_list %}
-  <div class="well">
-      <a href="{{post.id}}"><h3>{{post.Title}}</h3></a>
-      <h5>{{post.Date|date:"d-m-y"}}</h5>
-      <h5>{{post.Author}}</h5>
-  </div>
+<div class="well">
+    <a href="{{post.id}}"><h3>{{post.Title}}</h3></a>
+    <h5>{{post.Date|date:"d-m-y"}}</h5>
+    <h5>{{post.Author}}</h5>
+</div>
 {% endfor %}
+<div class="well">
+    <label for="add_article">To create new article press here..</label>
+    <a href="{% url 'new_post' %}" class="btn btn-info" id="add_article">Create new article</a>
+</div>
 {% endblock %}
