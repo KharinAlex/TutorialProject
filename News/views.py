@@ -63,6 +63,13 @@ def post_edit(request, pk):
 # Обработчик для удаления статьи
 def post_delete(request, pk):
     post = get_object_or_404(Article, pk=pk)
+    # Выполняем выборку комментариев, которые относятся к отображаемой статье
+    comments = Comment.objects.filter(article_id=pk)
+    # Прежде, чем удалить статью, нужно удалить все связанные с ней комментарии.
+    for i in comments:
+        # Удаляем комментарии
+        i.delete()
+    # Удаляем статью
     post.delete()
     # Переход на стартовую новостную страницу
     return redirect('News_page')
