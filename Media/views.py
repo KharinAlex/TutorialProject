@@ -9,8 +9,6 @@ def image_upload(request):
         if form.is_valid():
             form.save()
             return redirect('media_main')
-        else:
-            return redirect('/')
     else:
         form = UploadImageForm()
     return render(request, 'Media/mediaupload.html', {'form': form})

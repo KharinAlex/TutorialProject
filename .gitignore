@@ -2,11 +2,11 @@
 .idea/
 TutorialProject/__pycache__/
 SignIn/__pycache__/
-SignIn/migrations/__pycache__/
+SignIn/migrations/
 News/__pycache__/
-News/migrations/__pycache__/
+News/migrations/
 Media/__pycache__/
-Media/migrations/__pycache__/
+Media/migrations/
 HomePage/__pycache__/
-HomePage/migrations/__pycache__/
+HomePage/migrations/
 images/
