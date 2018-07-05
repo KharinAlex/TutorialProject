@@ -2,6 +2,16 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .forms import PostNewArticle, PostComment
 from .models import Article, Comment
 from django.utils import timezone
+from django.http import Http404
+
+
+# Функция для проверки наличия разрешения у пользователя на выполняемое действие
+def has_rights(item, user):
+    if not user.groups.filter(name="Moderator").exists() and \
+            not user.is_superuser and user != item.Author:
+        return False
+    else:
+        return True
 
 
 # Обработчик для отображения страницы со статьей
@@ -16,6 +26,9 @@ def post_detail(request, pk):
 
 # Обработчик для добавления в БД новой статьи
 def post_new(request):
+    # Если запрос отправил незарегестрированный пользователь - вернуть 404
+    if not request.user.is_authenticated:
+        return Http404
     # Проверка на тип полученного запроса
     if request.method == 'POST':
         # Создаем новую форму и заполняем ее параметрами из HTTP запроса
@@ -40,8 +53,15 @@ def post_new(request):
 
 # Обработчик для редактирования статьи
 def post_edit(request, pk):
+    # Если запрос отправил незарегестрированный пользователь - вернуть 404
+    if not request.user.is_authenticated:
+        return Http404
     # Получаем объект статьи по id
     post = get_object_or_404(Article, pk=pk)
+    # Проверить, есть ли право у пользователя, отправившего запрос, на редактирование этого поста.
+    if not has_rights(post, request.user):
+        # Если нет - выводим страницу с соответствующим сообщением
+        return render(request, 'News/forbidden.html')
     # Если пришел POST запрос - сохраняем внесенные изменения
     if request.method == 'POST':
         # Создаем форму на базе существующего объекта и изменяем его содержимое значениями из запроса
@@ -62,7 +82,11 @@ def post_edit(request, pk):
 
 # Обработчик для удаления статьи
 def post_delete(request, pk):
+    if not request.user.is_authenticated:
+        return Http404
     post = get_object_or_404(Article, pk=pk)
+    if not has_rights(post, request.user):
+        return render(request, 'News/forbidden.html')
     # Выполняем выборку комментариев, которые относятся к отображаемой статье
     comments = Comment.objects.filter(article_id=pk)
     # Прежде, чем удалить статью, нужно удалить все связанные с ней комментарии.
@@ -77,6 +101,8 @@ def post_delete(request, pk):
 
 # Обработчик для добавления комментария
 def post_comment(request, pk):
+    if not request.user.is_authenticated:
+        return Http404
     # Получаем объект статьи по id, к которой будет относиться комментарий
     article = get_object_or_404(Article, pk=pk)
     if request.method == 'POST':
@@ -97,8 +123,12 @@ def post_comment(request, pk):
 
 # Обработчик для редактирования комментария
 def edit_comment(request, pk):
+    if not request.user.is_authenticated:
+        return Http404
     # Получаем объект комментария по id
     comment = get_object_or_404(Comment, pk=pk)
+    if not has_rights(comment, request.user):
+        return render(request, 'News/forbidden.html')
     if request.method == 'POST':
         form = PostComment(request.POST, instance=comment)
         if form.is_valid():
@@ -115,7 +145,11 @@ def edit_comment(request, pk):
 
 # Обработчик для удаления комментария
 def delete_comment(request, pk):
+    if not request.user.is_authenticated:
+        return Http404
     comment = get_object_or_404(Comment, pk=pk)
+    if not has_rights(comment, request.user):
+        return render(request, 'News/forbidden.html')
     article_id = comment.article_id.id
     comment.delete()
     # Переход на страницу со статьей и комментариями

@@ -11,14 +11,12 @@
               <a href="{% url 'post_comment' pk=article.pk %}">
                   <span class="glyphicon glyphicon-comment"></span>
               </a>
-              {% if user == article.Author or user.is_superuser %}
               <a href="{% url 'edit_post' pk=article.pk %}">
                   <span class="glyphicon glyphicon-edit"></span>
               </a>
               <a href="{% url 'delete_post' pk=article.pk %}">
                   <span class="glyphicon glyphicon-remove"></span>
               </a>
-              {% endif %}
           </h5>
         {% endif %}
     </div>
@@ -31,17 +29,14 @@
             <div class="jumbotron">
               {{comment.Content|safe|linebreaks}}
               <h6 class="test-info" align="right">Published:{{comment.Date|date:"y-m-d h:m:s"}} by {{comment.Author}}</h6>
-
-                {% if user == comment.Author or user.is_superuser %}
-                <h5 align="right">
-                  <a href="{% url 'edit_comment' pk=comment.pk %}">
-                      <span class="glyphicon glyphicon-edit"></span>
-                  </a>
-                  <a href="{% url 'delete_comment' pk=comment.pk %}">
-                      <span class="glyphicon glyphicon-remove"></span>
-                  </a>
-                </h5>
-              {% endif %}
+              <h5 align="right">
+                <a href="{% url 'edit_comment' pk=comment.pk %}">
+                    <span class="glyphicon glyphicon-edit"></span>
+                </a>
+                <a href="{% url 'delete_comment' pk=comment.pk %}">
+                    <span class="glyphicon glyphicon-remove"></span>
+                </a>
+              </h5>
             </div>
             {% endfor %}
           {% else %}
