@@ -2,8 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .forms import PostNewArticle, PostComment
 from .models import Article, Comment
 from django.utils import timezone
-from django.http import Http404
-
+from django.contrib.auth.decorators import login_required
 
 # Функция для проверки наличия разрешения у пользователя на выполняемое действие
 def has_rights(item, user):
@@ -25,10 +24,9 @@ def post_detail(request, pk):
 
 
 # Обработчик для добавления в БД новой статьи
+# Вызов декоратора что бы проверить статус пользователя
+@login_required
 def post_new(request):
-    # Если запрос отправил незарегестрированный пользователь - вернуть 404
-    if not request.user.is_authenticated:
-        return Http404
     # Проверка на тип полученного запроса
     if request.method == 'POST':
         # Создаем новую форму и заполняем ее параметрами из HTTP запроса
@@ -52,10 +50,8 @@ def post_new(request):
 
 
 # Обработчик для редактирования статьи
+@login_required
 def post_edit(request, pk):
-    # Если запрос отправил незарегестрированный пользователь - вернуть 404
-    if not request.user.is_authenticated:
-        return Http404
     # Получаем объект статьи по id
     post = get_object_or_404(Article, pk=pk)
     # Проверить, есть ли право у пользователя, отправившего запрос, на редактирование этого поста.
@@ -81,9 +77,8 @@ def post_edit(request, pk):
 
 
 # Обработчик для удаления статьи
+@login_required
 def post_delete(request, pk):
-    if not request.user.is_authenticated:
-        return Http404
     post = get_object_or_404(Article, pk=pk)
     if not has_rights(post, request.user):
         return render(request, 'News/forbidden.html')
@@ -100,9 +95,8 @@ def post_delete(request, pk):
 
 
 # Обработчик для добавления комментария
+@login_required
 def post_comment(request, pk):
-    if not request.user.is_authenticated:
-        return Http404
     # Получаем объект статьи по id, к которой будет относиться комментарий
     article = get_object_or_404(Article, pk=pk)
     if request.method == 'POST':
@@ -122,9 +116,8 @@ def post_comment(request, pk):
 
 
 # Обработчик для редактирования комментария
+@login_required
 def edit_comment(request, pk):
-    if not request.user.is_authenticated:
-        return Http404
     # Получаем объект комментария по id
     comment = get_object_or_404(Comment, pk=pk)
     if not has_rights(comment, request.user):
@@ -144,9 +137,8 @@ def edit_comment(request, pk):
 
 
 # Обработчик для удаления комментария
+@login_required
 def delete_comment(request, pk):
-    if not request.user.is_authenticated:
-        return Http404
     comment = get_object_or_404(Comment, pk=pk)
     if not has_rights(comment, request.user):
         return render(request, 'News/forbidden.html')

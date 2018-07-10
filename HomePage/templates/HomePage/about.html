@@ -1,5 +1,7 @@
 {% extends "HomePage/wrapper.html" %}
-
+{% block title %}
+About
+{% endblock %}
 {% block content %}
     {% for key, val in content.items %}
         <p>{{key}} : {{val}}</p>

@@ -1,8 +1,7 @@
-<head>
-    <title>News</title>
-</head>
 {% extends "HomePage/wrapper.html" %}
-
+{% block title %}
+  News
+{% endblock %}
 {% block content %}
 {% for post in object_list %}
 <div class="well">
