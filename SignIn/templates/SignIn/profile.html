@@ -1,0 +1,37 @@
+{% extends 'SignIn/auth_template.html' %}
+{% block title %}
+User profile
+{% endblock %}
+
+{% load static %}
+{% block form %}
+<div class="container-fluid well span6">
+	<div class="row-fluid">
+        <div class="span2" >
+		    <img src="{{user.photo.url}}" class="img-circle">
+        </div>
+
+        <div class="span8">
+            <h3>{{user.user_id.username}}</h3>
+            <h6>{% if user.user_id.email %} Email: {{user.user_id.email}} {% endif %}</h6>
+            <h6>{% if user.country %}  Location: {{user.country}} {% endif %}</h6>
+            <h6>{% if user.birthday %} Birthday: {{user.birthday}} {% endif %}</h6>
+            <h6>Registration date: {{user.user_id.date_joined}}</h6>
+            <h6>Last login: {{user.user_id.last_login}}</h6>
+        </div>
+
+        <div class="dropdown" align="right">
+            <div class="btn-group">
+                <a class="btn dropdown-toggle btn-info" data-toggle="dropdown" href="#">
+                    Action
+                    <span class="icon-cog icon-white"></span><span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="#"><span class="icon-wrench"></span> Modify</a></li>
+                    <li><a href="#"><span class="icon-trash"></span> Delete</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

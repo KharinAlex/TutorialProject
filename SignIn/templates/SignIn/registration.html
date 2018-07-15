@@ -7,18 +7,16 @@ Registration
 {% block form %}
 <form action="" method="post">
     {{ form.non_field_errors }}
+     {% csrf_token %}
     <div class="form-group">
-        {% csrf_token %}
         <label>Username</label>
         {{ form.username }}
     </div>
     <div class="form-group">
-        {% csrf_token %}
         <label>Password</label>
         {{ form.password1 }}
     </div>
     <div class="form-group">
-        {% csrf_token %}
         <label>Confirm Password</label>
         {{ form.password2 }}
     </div>

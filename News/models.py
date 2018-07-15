@@ -6,7 +6,7 @@ class Article(models.Model):
     Title = models.CharField(max_length=150)
     Content = models.TextField()
     Date = models.DateTimeField()
-    Author = models.ForeignKey(User, on_delete=models.CASCADE)
+    Author = models.ForeignKey(User, on_delete=models.DO_NOTHING)
 
 
 class Comment(models.Model):

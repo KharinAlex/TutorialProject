@@ -5,6 +5,8 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login
 from django.contrib.auth import logout
 from django.http import HttpResponseRedirect
+from django.shortcuts import render, get_object_or_404
+from .models import UserModel
 
 
 
@@ -46,3 +48,8 @@ class LogoutView(View):
 
         # После чего, перенаправляем пользователя на главную страницу.
         return HttpResponseRedirect("/")
+
+
+def ProfileView(request):
+    userModel = get_object_or_404(UserModel, user_id=request.user)
+    return render(request, 'SignIn/profile.html', {'user': userModel})
