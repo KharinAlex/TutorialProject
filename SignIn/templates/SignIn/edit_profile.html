@@ -1,0 +1,17 @@
+{% extends "SignIn/auth_template.html" %}
+
+{% block title %}
+Profile edit
+{% endblock %}
+
+{% block form %}
+<form method="post" enctype="multipart/form-data">
+    {{ form.non_field_errors }}
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="btn btn-info navbar-btn" type="submit">
+        Save
+        <span class="glyphicon glyphicon-floppy-disk"></span>
+    </button>
+</form>
+{% endblock %}

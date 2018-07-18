@@ -16,7 +16,7 @@
 <nav class="navbar navbar-inverse">
   <div class="container-fluid">
     <div class="navbar-header">
-      <a class="navbar-brand" href={% if user.is_superuser %}"/admin/" {% elif user.is_authenticated %} {% url 'Profile' %} {% endif %}>My Site</a>
+      <a class="navbar-brand" href={% if user.is_superuser %}"/admin/" {% elif user.is_authenticated %} {% url 'Profile' %} {% endif %}>Profile</a>
     </div>
     <ul class="nav navbar-nav">
       <li {% if 'home' in request.path %}class="active"{% endif %}><a href="/home/">Home</a></li>

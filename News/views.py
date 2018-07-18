@@ -4,6 +4,7 @@ from .models import Article, Comment
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 
+
 # Функция для проверки наличия разрешения у пользователя на выполняемое действие
 def has_rights(item, user):
     if not user.groups.filter(name="Moderator").exists() and \

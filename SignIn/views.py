@@ -1,13 +1,14 @@
-from django.views.generic.edit import FormView
-from django.views.generic.base import View
+from django.views.generic.edit import FormView, UpdateView, DeleteView
+from django.views.generic.base import View, TemplateView
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.models import User
 from django.contrib.auth import login
 from django.contrib.auth import logout
 from django.http import HttpResponseRedirect
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import redirect, get_object_or_404
 from .models import UserModel
-
+from .forms import ProfileForm
 
 
 class RegisterFormView(FormView):
@@ -50,6 +51,46 @@ class LogoutView(View):
         return HttpResponseRedirect("/")
 
 
-def ProfileView(request):
-    userModel = get_object_or_404(UserModel, user_id=request.user)
-    return render(request, 'SignIn/profile.html', {'user': userModel})
+class ProfileView(TemplateView):
+    template_name = 'SignIn/profile.html'
+
+    def get_context_data(self, **kwargs):
+        userModel = get_object_or_404(UserModel, user_id=self.request.user)
+        context = super().get_context_data(**kwargs)
+        context['user'] = userModel
+        return context
+
+
+class UserEdit(UpdateView):
+    model = User
+    fields = ('first_name', 'last_name', 'email')
+    template_name = "SignIn/edit_profile.html"
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
+    def form_valid(self, form):
+        form.save()
+        return redirect('Profile')
+
+
+class ProfileEdit(UpdateView):
+    form_class = ProfileForm
+    template_name = "SignIn/edit_profile.html"
+
+    def get_object(self, queryset=None):
+        return get_object_or_404(UserModel, user_id=self.request.user)
+
+    def form_valid(self, form):
+        form.save()
+        return redirect('Profile')
+
+
+class ProfileDelete(DeleteView):
+    model = User
+    template_name = "SignIn/confirm_delete.html"
+    success_url = '/'
+
+    def get_object(self, queryset=None):
+        return self.request.user
+

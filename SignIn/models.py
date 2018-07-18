@@ -6,7 +6,7 @@ from django.dispatch import receiver
 
 class UserModel(models.Model):
     user_id = models.OneToOneField(User, unique=True, on_delete=models.CASCADE)
-    about = models.TextField(default=" ")
+    about = models.TextField(default="")
     birthday = models.DateField(default="1970-01-01")
     country = models.CharField(max_length=15, default="")
     photo = models.ImageField(default="default_photo.png")
