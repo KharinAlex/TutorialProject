@@ -26,6 +26,7 @@ class RegisterFormView(FormView):
         # Вызываем метод базового класса
         return super(RegisterFormView, self).form_valid(form)
 
+
 class LoginFormView(FormView):
     form_class = AuthenticationForm
 
@@ -42,6 +43,7 @@ class LoginFormView(FormView):
         # Выполняем аутентификацию пользователя.
         login(self.request, self.user)
         return super(LoginFormView, self).form_valid(form)
+
 
 class LogoutView(View):
     def get(self, request):
