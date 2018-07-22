@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     'Media',
     'News',
     'SignIn',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [

@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
 from .settings import MEDIA_URL, MEDIA_ROOT
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('HomePage.urls')),
@@ -24,6 +25,7 @@ urlpatterns = [
     path('news/', include('News.urls')),
     path('media/', include('Media.urls')),
     path('auth/', include('SignIn.urls')),
+    path('api/', include('SignIn.api_urls')),
 ]
 
 urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)
