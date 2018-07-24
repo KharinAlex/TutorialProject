@@ -1,19 +1,13 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from django.shortcuts import get_object_or_404
+from rest_framework import viewsets
+from django.contrib.auth.models import User
 from SignIn import serializers, models
 
 
-class UserView(APIView):
-
-    def get(self, request):
-        serializer = serializers.UserSerializer(request.user)
-        return Response(serializer.data)
+class UserView(viewsets.ModelViewSet):
+        queryset = User.objects.all()
+        serializer_class = serializers.UserSerializer
 
 
-class UserProfileView(APIView):
-
-    def get(self, request):
-        userModel = get_object_or_404(models.UserModel, user_id=request.user)
-        serializer = serializers.UserProfileSerializer(userModel)
-        return Response(serializer.data)
+class UserProfileView(viewsets.ModelViewSet):
+        queryset = models.UserModel.objects.all()
+        serializer_class = serializers.UserProfileSerializer

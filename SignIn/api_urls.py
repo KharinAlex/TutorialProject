@@ -1,9 +1,12 @@
 from django.urls import path, include
 from .api_views import UserView, UserProfileView
+from rest_framework import routers
 
+router = routers.DefaultRouter()
+router.register('users', UserView)
+router.register('profile', UserProfileView)
 
 urlpatterns = [
-    path('', UserView.as_view(), name='api_user'),
-    path('profile/', UserProfileView.as_view(), name='api_profile'),
-    path('auth/', include('rest_framework.urls', namespace='rest_framework'))
+    path('auth', include('rest_framework.urls', namespace='rest_framework')),
+    path('', include(router.urls)),
 ]
