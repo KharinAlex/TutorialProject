@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from django.views.generic import ListView
 from . import views
 from News.models import Article
@@ -14,4 +14,5 @@ urlpatterns = [
     path('comment/<pk>/delete', views.delete_comment, name='delete_comment'),
     path('<pk>/edit', views.post_edit, name='edit_post'),
     path('<pk>/delete', views.post_delete, name='delete_post'),
+    path('api/', include('News.api_urls')),
 ]

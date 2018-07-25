@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 
 
@@ -10,5 +10,6 @@ urlpatterns = [
     path('profile/delete', views.ProfileDelete.as_view(), name='ProfileDelete'),
     path('', views.LoginFormView.as_view()),
     path('registration/', views.RegisterFormView.as_view()),
-    path('logout/', views.LogoutView.as_view())
+    path('logout/', views.LogoutView.as_view()),
+    path('api/', include('SignIn.api_urls')),
 ]
