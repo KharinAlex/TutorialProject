@@ -3,7 +3,8 @@ from .forms import PostNewArticle, PostComment
 from .models import Article, Comment
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
-
+from django.views.generic.base import TemplateView
+from django.views.generic.edit import UpdateView, DeleteView
 
 # Функция для проверки наличия разрешения у пользователя на выполняемое действие
 def has_rights(item, user):

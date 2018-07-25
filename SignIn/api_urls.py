@@ -7,6 +7,6 @@ router.register('users', UserView)
 router.register('profile', UserProfileView)
 
 urlpatterns = [
-    path('auth', include('rest_framework.urls', namespace='rest_framework')),
+    path('auth', include('rest_framework.urls', namespace="profile_api")),
     path('', include(router.urls)),
 ]

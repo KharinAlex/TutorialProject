@@ -7,6 +7,6 @@ router.register('articles', ArticleView)
 router.register('comments', CommentView)
 
 urlpatterns = [
-    path('auth', include('rest_framework.urls', namespace='rest_framework')),
+    path('auth', include('rest_framework.urls', namespace="news_api")),
     path('', include(router.urls)),
 ]

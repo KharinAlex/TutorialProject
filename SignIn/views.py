@@ -7,6 +7,7 @@ from django.contrib.auth import login
 from django.contrib.auth import logout
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, get_object_or_404
+from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import UserModel
 from .forms import ProfileForm
 
@@ -53,7 +54,7 @@ class LogoutView(View):
         return HttpResponseRedirect("/")
 
 
-class ProfileView(TemplateView):
+class ProfileView(LoginRequiredMixin, TemplateView):
     template_name = 'SignIn/profile.html'
 
     def get_context_data(self, **kwargs):
@@ -63,7 +64,7 @@ class ProfileView(TemplateView):
         return context
 
 
-class UserEdit(UpdateView):
+class UserEdit(LoginRequiredMixin, UpdateView):
     model = User
     fields = ('first_name', 'last_name', 'email')
     template_name = "SignIn/edit_profile.html"
@@ -76,7 +77,7 @@ class UserEdit(UpdateView):
         return redirect('Profile')
 
 
-class ProfileEdit(UpdateView):
+class ProfileEdit(LoginRequiredMixin, UpdateView):
     form_class = ProfileForm
     template_name = "SignIn/edit_profile.html"
 
@@ -88,7 +89,7 @@ class ProfileEdit(UpdateView):
         return redirect('Profile')
 
 
-class ProfileDelete(DeleteView):
+class ProfileDelete(LoginRequiredMixin, DeleteView):
     model = User
     template_name = "SignIn/confirm_delete.html"
     success_url = '/'
