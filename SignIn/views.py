@@ -69,24 +69,31 @@ class UserEdit(LoginRequiredMixin, UpdateView):
     fields = ('first_name', 'last_name', 'email')
     template_name = "SignIn/edit_profile.html"
 
+    def get_success_url(self):
+        return '/auth/profile/'
+
     def get_object(self, queryset=None):
         return self.request.user
 
     def form_valid(self, form):
         form.save()
-        return redirect('Profile')
+        return super(UserEdit, self).form_valid(form)
 
 
 class ProfileEdit(LoginRequiredMixin, UpdateView):
     form_class = ProfileForm
+    model = UserModel
     template_name = "SignIn/edit_profile.html"
 
+    def get_success_url(self):
+        return '/auth/profile/'
+
     def get_object(self, queryset=None):
-        return get_object_or_404(UserModel, user_id=self.request.user)
+        return UserModel.objects.get(user_id=self.request.user)
 
     def form_valid(self, form):
         form.save()
-        return redirect('Profile')
+        return super(ProfileEdit, self).form_valid(form)
 
 
 class ProfileDelete(LoginRequiredMixin, DeleteView):
