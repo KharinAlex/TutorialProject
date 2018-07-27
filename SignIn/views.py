@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import login
 from django.contrib.auth import logout
 from django.http import HttpResponseRedirect
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import get_object_or_404, reverse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import UserModel
 from .forms import ProfileForm
@@ -70,7 +70,7 @@ class UserEdit(LoginRequiredMixin, UpdateView):
     template_name = "SignIn/edit_profile.html"
 
     def get_success_url(self):
-        return '/auth/profile/'
+        return reverse('Profile')
 
     def get_object(self, queryset=None):
         return self.request.user
@@ -86,7 +86,7 @@ class ProfileEdit(LoginRequiredMixin, UpdateView):
     template_name = "SignIn/edit_profile.html"
 
     def get_success_url(self):
-        return '/auth/profile/'
+        return reverse('Profile')
 
     def get_object(self, queryset=None):
         return UserModel.objects.get(user_id=self.request.user)

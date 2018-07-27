@@ -1,10 +1,11 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from .forms import PostNewArticle, PostComment
+from django.shortcuts import get_object_or_404, reverse
 from .models import Article, Comment
 from django.utils import timezone
-from django.contrib.auth.decorators import login_required
+from django.views.generic import ListView
 from django.views.generic.base import TemplateView
-from django.views.generic.edit import UpdateView, DeleteView
+from django.views.generic.edit import UpdateView, DeleteView, CreateView
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 
 # Функция для проверки наличия разрешения у пользователя на выполняемое действие
 def has_rights(item, user):
@@ -15,136 +16,98 @@ def has_rights(item, user):
         return True
 
 
-# Обработчик для отображения страницы со статьей
-def post_detail(request, pk):
-    # Получаем объект статьи по id
-    article = get_object_or_404(Article, pk=pk)
-    # Выполняем выборку комментариев, которые относятся к отображаемой статье
-    comments = Comment.objects.filter(article_id=pk)
-    # Отображаем страницу, передавая ей объект статьи и QuerySet из комментариев
-    return render(request, 'News/post.html', {'article': article, 'comments': comments})
+class ArticleListView(ListView):
+    queryset = Article.objects.order_by("-Date")[:20]
+    template_name = "News/news.html"
 
 
-# Обработчик для добавления в БД новой статьи
-# Вызов декоратора что бы проверить статус пользователя
-@login_required
-def post_new(request):
-    # Проверка на тип полученного запроса
-    if request.method == 'POST':
-        # Создаем новую форму и заполняем ее параметрами из HTTP запроса
-        form = PostNewArticle(request.POST)
-        # Проверка на валидность
-        if form.is_valid():
-            # Сохраняем данные из формы, но не вносим БД, поскольку не все поля сущности заполнялись из формы
-            post = form.save(commit=False)
-            # Заполняем остальные поля сущности
-            post.Author = request.user
-            post.Date = timezone.now()
-            # Сохраняем статью в БД
+class ArticleDetailView(TemplateView):
+    template_name = 'News/post.html'
+
+    def get_context_data(self, **kwargs):
+        article  = get_object_or_404(Article, pk=kwargs['pk'])
+        comments = Comment.objects.filter(article_id=article)
+        context  = super().get_context_data(**kwargs)
+
+        context['article']  = article
+        context['comments'] = comments
+        return context
+
+
+class PostCreateView(LoginRequiredMixin, CreateView):
+    template_name = 'News/post_new.html'
+
+    def __init__(self, model, form_class):
+        self.post_id    = None
+        self.model      = model
+        self.form_class = form_class
+
+    def get_success_url(self):
+        return reverse('post_detail', kwargs={'pk': self.post_id})
+
+    def form_valid(self, form):
+        post        = form.save(commit=False)
+        post.Author = self.request.user
+        post.Date   = timezone.now()
+        if self.model == Comment:
+            self.post_id    = self.kwargs['pk']
+            post.article_id = Article.objects.get(pk=self.post_id)
             post.save()
-            # Переход на персональную ссылку для только-что созданной статьи
-            return redirect('post_detail', post.id)
-    else:
-        # Если пришел GET запрос - создаем пустую форму
-        form = PostNewArticle()
-    # Отрисовка формы на странице
-    return render(request, 'News/post_new.html', {'form': form})
-
-
-# Обработчик для редактирования статьи
-@login_required
-def post_edit(request, pk):
-    # Получаем объект статьи по id
-    post = get_object_or_404(Article, pk=pk)
-    # Проверить, есть ли право у пользователя, отправившего запрос, на редактирование этого поста.
-    if not has_rights(post, request.user):
-        # Если нет - выводим страницу с соответствующим сообщением
-        return render(request, 'News/forbidden.html')
-    # Если пришел POST запрос - сохраняем внесенные изменения
-    if request.method == 'POST':
-        # Создаем форму на базе существующего объекта и изменяем его содержимое значениями из запроса
-        form = PostNewArticle(request.POST, instance=post)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.Author = request.user
-            post.Date = timezone.now()
+        else:
             post.save()
-            # Переход на отредактированную статью
-            return redirect('post_detail', pk=post.id)
-    else:
-        # Если пришел GET запрос - создаем форму с текущим содержанием статьи
-        form = PostNewArticle(instance=post)
-    # Отрисовка формы на странице
-    return render(request, 'News/post_new.html', {'form': form})
+            self.post_id = post.id
+        return super(PostCreateView, self).form_valid(form)
 
 
-# Обработчик для удаления статьи
-@login_required
-def post_delete(request, pk):
-    post = get_object_or_404(Article, pk=pk)
-    if not has_rights(post, request.user):
-        return render(request, 'News/forbidden.html')
-    # Выполняем выборку комментариев, которые относятся к отображаемой статье
-    comments = Comment.objects.filter(article_id=pk)
-    # Прежде, чем удалить статью, нужно удалить все связанные с ней комментарии.
-    for i in comments:
-        # Удаляем комментарии
-        i.delete()
-    # Удаляем статью
-    post.delete()
-    # Переход на стартовую новостную страницу
-    return redirect('News_page')
+class PostEditView(LoginRequiredMixin, UpdateView):
+    template_name = 'News/post_new.html'
+
+    def get_object(self, queryset=None):
+        return get_object_or_404(self.model, pk=self.kwargs['pk'])
+
+    def get_success_url(self):
+        if self.model == Comment:
+            pk = Comment.objects.get(pk=self.kwargs['pk']).article_id.id
+        else:
+            pk = self.kwargs['pk']
+        return reverse('post_detail', kwargs={'pk': pk})
+
+    def get_template_names(self):
+        if not has_rights(self.model.objects.get(pk=self.kwargs['pk']), self.request.user):
+            return 'News/forbidden.html'
+        else:
+            return self.template_name
+
+    def form_valid(self, form):
+        post = form.save(commit=False)
+        post.Author = self.request.user
+        post.Date = timezone.now()
+        post.save()
+        return super(PostEditView, self).form_valid(form)
 
 
-# Обработчик для добавления комментария
-@login_required
-def post_comment(request, pk):
-    # Получаем объект статьи по id, к которой будет относиться комментарий
-    article = get_object_or_404(Article, pk=pk)
-    if request.method == 'POST':
-        form = PostComment(request.POST)
-        if form.is_valid():
-            comment = form.save(commit=False)
-            # Заполняем поле ключа, в качестве которого выступает статья
-            comment.article_id = article
-            comment.Author = request.user
-            comment.Date = timezone.now()
-            comment.save()
-            # Переход на страницу со статьей и комментариями
-            return redirect('post_detail', pk=pk)
-    else:
-        form = PostComment()
-    return render(request, 'News/post_new.html', {'form': form})
+class PostDeleteView(LoginRequiredMixin, DeleteView):
 
+    def __init__(self, model):
+        self.pk    = None
+        self.model = model
 
-# Обработчик для редактирования комментария
-@login_required
-def edit_comment(request, pk):
-    # Получаем объект комментария по id
-    comment = get_object_or_404(Comment, pk=pk)
-    if not has_rights(comment, request.user):
-        return render(request, 'News/forbidden.html')
-    if request.method == 'POST':
-        form = PostComment(request.POST, instance=comment)
-        if form.is_valid():
-            comment = form.save(commit=False)
-            comment.Author = request.user
-            comment.Date = timezone.now()
-            comment.save()
-            # Переход на страницу со статьей и комментариями
-            return redirect('post_detail', pk=comment.article_id.id)
-    else:
-        form = PostComment(instance=comment)
-    return render(request, 'News/post_new.html', {'form': form})
+    def get(self, request, *args, **kwargs):
+        return self.post(request, *args, **kwargs)
 
+    def get_success_url(self):
+        if self.model == Comment:
+            return reverse('post_detail', kwargs={'pk': self.pk})
+        else:
+            return reverse('News_page')
 
-# Обработчик для удаления комментария
-@login_required
-def delete_comment(request, pk):
-    comment = get_object_or_404(Comment, pk=pk)
-    if not has_rights(comment, request.user):
-        return render(request, 'News/forbidden.html')
-    article_id = comment.article_id.id
-    comment.delete()
-    # Переход на страницу со статьей и комментариями
-    return redirect('post_detail', pk=article_id)
+    def get_template_names(self):
+        if not has_rights(self.model.objects.get(pk=self.kwargs['pk']), self.request.user):
+            return 'News/forbidden.html'
+        else:
+            return self.template_name
+
+    def get_object(self, queryset=None):
+        if self.model == Comment:
+            self.pk = Comment.objects.get(pk=self.kwargs['pk']).article_id.id
+        return self.model.objects.get(pk=self.kwargs['pk'])
