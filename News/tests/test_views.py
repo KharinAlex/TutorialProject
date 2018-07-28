@@ -19,7 +19,7 @@ class NewsViewsTest(TestCase):
         self.moderator.save()
 
     def tearDown(self):
-        User.objects.get(id=1).delete()
+        User.objects.all().delete()
 
     def test_article_list_view(self):
         """
@@ -144,7 +144,7 @@ class NewsViewsTest(TestCase):
         """
         Testing edit view for comments
         """
-        # create article
+        # create article and comment for it
         article = Article.objects.create(Author=self.user1,
                                          Title='Article title',
                                          Content='Article content',
