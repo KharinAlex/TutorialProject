@@ -17,7 +17,7 @@ def has_rights(item, user):
 
 
 class ArticleListView(ListView):
-    queryset = Article.objects.order_by("-Date")[:20]
+    queryset      = Article.objects.order_by("-Date")[:20]
     template_name = "News/news.html"
 
 
@@ -26,11 +26,12 @@ class ArticleDetailView(TemplateView):
 
     def get_context_data(self, **kwargs):
         article  = get_object_or_404(Article, pk=kwargs['pk'])
-        comments = Comment.objects.filter(article_id=article)
         context  = super().get_context_data(**kwargs)
 
-        context['article']  = article
-        context['comments'] = comments
+        context['article'] = article
+        if self.request.user.is_authenticated:
+            comments = Comment.objects.filter(article_id=article)
+            context['comments'] = comments
         return context
 
 

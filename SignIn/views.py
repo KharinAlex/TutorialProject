@@ -58,15 +58,15 @@ class ProfileView(LoginRequiredMixin, TemplateView):
     template_name = 'SignIn/profile.html'
 
     def get_context_data(self, **kwargs):
-        userModel = get_object_or_404(UserModel, user_id=self.request.user)
-        context = super().get_context_data(**kwargs)
+        userModel       = get_object_or_404(UserModel, user_id=self.request.user)
+        context         = super().get_context_data(**kwargs)
         context['user'] = userModel
         return context
 
 
 class UserEdit(LoginRequiredMixin, UpdateView):
-    model = User
-    fields = ('first_name', 'last_name', 'email')
+    model         = User
+    fields        = ('first_name', 'last_name', 'email')
     template_name = "SignIn/edit_profile.html"
 
     def get_success_url(self):
@@ -81,8 +81,8 @@ class UserEdit(LoginRequiredMixin, UpdateView):
 
 
 class ProfileEdit(LoginRequiredMixin, UpdateView):
-    form_class = ProfileForm
-    model = UserModel
+    form_class    = ProfileForm
+    model         = UserModel
     template_name = "SignIn/edit_profile.html"
 
     def get_success_url(self):
@@ -97,9 +97,9 @@ class ProfileEdit(LoginRequiredMixin, UpdateView):
 
 
 class ProfileDelete(LoginRequiredMixin, DeleteView):
-    model = User
+    model         = User
     template_name = "SignIn/confirm_delete.html"
-    success_url = '/'
+    success_url   = '/'
 
     def get_object(self, queryset=None):
         return self.request.user
