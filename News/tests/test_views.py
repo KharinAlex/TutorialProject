@@ -7,7 +7,7 @@ from News.models import Article, Comment
 import pytz
 
 
-class SignInViewsTest(TestCase):
+class NewsViewsTest(TestCase):
     def setUp(self):
         self.user1     = User.objects.create_user(username='user1', password='qwerty321')
         self.user2     = User.objects.create_user(username='user2', password='qwerty321')
