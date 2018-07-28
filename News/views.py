@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404, reverse
+from django.shortcuts import get_object_or_404, reverse, render
 from .models import Article, Comment
 from django.utils import timezone
 from django.views.generic import ListView
@@ -94,19 +94,16 @@ class PostDeleteView(LoginRequiredMixin, DeleteView):
         self.model = model
 
     def get(self, request, *args, **kwargs):
-        return self.post(request, *args, **kwargs)
+        if not has_rights(self.model.objects.get(pk=self.kwargs['pk']), self.request.user):
+            return render(request, 'News/forbidden.html')
+        else:
+            return self.post(request, *args, **kwargs)
 
     def get_success_url(self):
         if self.model == Comment:
             return reverse('post_detail', kwargs={'pk': self.pk})
         else:
             return reverse('News_page')
-
-    def get_template_names(self):
-        if not has_rights(self.model.objects.get(pk=self.kwargs['pk']), self.request.user):
-            return 'News/forbidden.html'
-        else:
-            return self.template_name
 
     def get_object(self, queryset=None):
         if self.model == Comment:

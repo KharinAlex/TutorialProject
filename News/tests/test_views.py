@@ -67,7 +67,7 @@ class NewsViewsTest(TestCase):
         """
         # for anonymous user
         response = self.client.get(reverse('new_post'))
-        self.assertRedirects(response, '/auth/login?next=' + reverse('new_post'), target_status_code=301)
+        self.assertRedirects(response, reverse('Login')[:-1] + '?next=' + reverse('new_post'), target_status_code=301)
 
         # for authorized user
         log = self.client.login(username=self.user1.username, password='qwerty321')
@@ -75,7 +75,7 @@ class NewsViewsTest(TestCase):
         response = self.client.get(reverse('new_post'))
         self.assertEqual(response.status_code, 200)
 
-        #article
+        # article
         form = PostNewArticle(data={'Title': 'Article title',
                                     'Content': 'article content',
                                     })
@@ -87,7 +87,7 @@ class NewsViewsTest(TestCase):
         self.assertEqual(article.Content, 'article content')
         self.assertEqual(article.Author, self.user1)
 
-        #comment
+        # comment
         form = PostComment(data={'Content': 'comment content', })
         response = self.client.post(reverse('post_comment', kwargs={'pk': article.id}), form.data)
         self.assertTrue(Comment.objects.filter(id=1).exists())
@@ -96,3 +96,157 @@ class NewsViewsTest(TestCase):
         self.assertEqual(comment.Content, 'comment content')
         self.assertEqual(comment.article_id, article)
         self.assertEqual(comment.Author, self.user1)
+
+    def test_edit_article(self):
+        """
+        Testing edit view for article
+        """
+        # create article
+        article = Article.objects.create(Author=self.user1,
+                               Title='Article title',
+                               Content='Article content',
+                               Date=datetime.now(tz=pytz.UTC))
+        # for anonymous user
+        response = self.client.get(reverse('edit_post', kwargs={'pk': article.id}))
+        self.assertRedirects(response,
+                             reverse('Login')[:-1] + '?next=' + reverse('edit_post', kwargs={'pk': article.id}),
+                             target_status_code=301)
+
+        # for authorized user, but not author
+        log = self.client.login(username=self.user2.username, password='qwerty321')
+        self.assertTrue(log)
+        response = self.client.get(reverse('edit_post', kwargs={'pk': article.id}))
+        self.assertContains(response, 'You have no rights to preform this action')
+
+        # for article's author
+        log = self.client.login(username=self.user1.username, password='qwerty321')
+        self.assertTrue(log)
+        response = self.client.get(reverse('edit_post', kwargs={'pk': article.id}))
+        self.assertEqual(article, response.context['article'])
+
+        # for moderator
+        log = self.client.login(username=self.moderator.username, password='qwerty321')
+        self.assertTrue(log)
+        response = self.client.get(reverse('edit_post', kwargs={'pk': article.id}))
+        self.assertEqual(article, response.context['article'])
+
+        form = PostNewArticle(data={'Title': 'Edited article title',
+                                    'Content': 'New article content',
+                                    })
+        response = self.client.post(reverse('edit_post', kwargs={'pk': article.id, }),  form.data)
+        self.assertRedirects(response, reverse('post_detail', kwargs={'pk': article.id, }))
+        article = Article.objects.get(id=article.id)
+        self.assertEqual(article.Title, 'Edited article title')
+        self.assertEqual(article.Content, 'New article content')
+        self.assertEqual(article.Author, self.moderator)
+
+    def test_edit_comment(self):
+        """
+        Testing edit view for comments
+        """
+        # create article
+        article = Article.objects.create(Author=self.user1,
+                                         Title='Article title',
+                                         Content='Article content',
+                                         Date=datetime.now(tz=pytz.UTC))
+        comment = Comment.objects.create(Author=self.user1,
+                                         Content='Comment content',
+                                         Date=datetime.now(tz=pytz.UTC),
+                                         article_id=article)
+
+        # for anonymous user
+        response = self.client.get(reverse('edit_comment', kwargs={'pk': comment.id}))
+        self.assertRedirects(response,
+                             reverse('Login')[:-1] + '?next=' + reverse('edit_comment', kwargs={'pk': comment.id}),
+                             target_status_code=301)
+
+        # for authorized user, but not author
+        log = self.client.login(username=self.user2.username, password='qwerty321')
+        self.assertTrue(log)
+        response = self.client.get(reverse('edit_comment', kwargs={'pk': comment.id}))
+        self.assertContains(response, 'You have no rights to preform this action')
+
+        # for comment's author
+        log = self.client.login(username=self.user1.username, password='qwerty321')
+        self.assertTrue(log)
+        response = self.client.get(reverse('edit_comment', kwargs={'pk': comment.id}))
+        self.assertEqual(comment, response.context['comment'])
+
+        # for moderator
+        log = self.client.login(username=self.moderator.username, password='qwerty321')
+        self.assertTrue(log)
+        response = self.client.get(reverse('edit_comment', kwargs={'pk': comment.id}))
+        self.assertEqual(comment, response.context['comment'])
+
+        form = PostComment(data={'Content': 'New comment content', })
+        response = self.client.post(reverse('edit_comment', kwargs={'pk': comment.id, }),  form.data)
+        self.assertRedirects(response, reverse('post_detail', kwargs={'pk': article.id, }))
+        comment = Comment.objects.get(id=comment.id)
+        self.assertEqual(comment.article_id, article)
+        self.assertEqual(comment.Content, 'New comment content')
+        self.assertEqual(comment.Author, self.moderator)
+
+    def test_delete_article(self):
+        """
+        Testing delete view for article
+        """
+        article = Article.objects.create(Author=self.user1,
+                                         Title='Title',
+                                         Content='Content',
+                                         Date=datetime.now(tz=pytz.UTC))
+        comment = Comment.objects.create(Author=self.user1,
+                                         Content='Comment content',
+                                         Date=datetime.now(tz=pytz.UTC),
+                                         article_id=article)
+        # for anonymous user
+        response = self.client.get(reverse('delete_post', kwargs={'pk': article.id}))
+        self.assertRedirects(response,
+                             reverse('Login')[:-1] + '?next=' + reverse('delete_post', kwargs={'pk': article.id}),
+                             target_status_code=301)
+
+        # for authorized user, but not author
+        log = self.client.login(username=self.user2.username, password='qwerty321')
+        self.assertTrue(log)
+        response = self.client.get(reverse('delete_post', kwargs={'pk': article.id}))
+        self.assertContains(response, 'You have no rights to preform this action')
+
+        # for article's author
+        log = self.client.login(username=self.user1.username, password='qwerty321')
+        self.assertTrue(log)
+        response = self.client.get(reverse('delete_post', kwargs={'pk': article.id}))
+        self.assertRedirects(response, reverse('News_page'))
+
+        self.assertNotIn(article, Article.objects.all())
+        self.assertNotIn(comment, Comment.objects.all())
+
+    def test_delete_comment(self):
+        """
+        Testing delete view for comments
+        """
+        article = Article.objects.create(Author=self.user1,
+                                         Title='Title',
+                                         Content='Content',
+                                         Date=datetime.now(tz=pytz.UTC))
+        comment = Comment.objects.create(Author=self.user1,
+                                         Content='Comment content',
+                                         Date=datetime.now(tz=pytz.UTC),
+                                         article_id=article)
+        # for anonymous user
+        response = self.client.get(reverse('delete_comment', kwargs={'pk': comment.id}))
+        self.assertRedirects(response,
+                             reverse('Login')[:-1] + '?next=' + reverse('delete_comment', kwargs={'pk': comment.id}),
+                             target_status_code=301)
+
+        # for authorized user, but not author
+        log = self.client.login(username=self.user2.username, password='qwerty321')
+        self.assertTrue(log)
+        response = self.client.get(reverse('delete_comment', kwargs={'pk': comment.id}))
+        self.assertContains(response, 'You have no rights to preform this action')
+
+        # for comment's author
+        log = self.client.login(username=self.user1.username, password='qwerty321')
+        self.assertTrue(log)
+        response = self.client.get(reverse('delete_comment', kwargs={'pk': comment.id}))
+        self.assertRedirects(response, reverse('post_detail', kwargs={'pk': article.id}))
+
+        self.assertNotIn(comment, Comment.objects.all())
