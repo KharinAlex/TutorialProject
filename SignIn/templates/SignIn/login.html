@@ -18,9 +18,9 @@ Sign In
         <label>Password</label>
         {{ form.password }}
     </div>
-    <button type="submit" class="btn btn-primary">Sign In</button>
+    <button type="submit" name="signin" class="btn btn-primary">Sign In</button>
 </form>
 <form action="/auth/registration/">
-    <button class="btn btn-info navbar-btn">Registration</button>
+    <button class="btn btn-info navbar-btn" name="registr">Registration</button>
 </form>
 {% endblock %}

@@ -10,4 +10,5 @@ News/migrations/
 Media/__pycache__/
 Media/migrations/
 HomePage/__pycache__/
+HomePage/tests/__pycache__/
 HomePage/migrations/
