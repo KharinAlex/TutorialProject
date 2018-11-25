@@ -1,5 +1,4 @@
 from django.test import TestCase
-from django.contrib.auth.models import User
 from datetime import datetime
 from SignIn.models import UserModel
 from SignIn.forms import ProfileForm
@@ -7,10 +6,10 @@ from SignIn.forms import ProfileForm
 
 class SignInFormsTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username='user', password='qwerty321')
+        pass
 
     def tearDown(self):
-        User.objects.get(id=1).delete()
+        pass
 
     def test_forms_valid(self):
         """
@@ -23,8 +22,11 @@ class SignInFormsTest(TestCase):
                                  })
         self.assertTrue(form.is_valid())
         model_type = type(form.instance)
-        # check model type
         self.assertEqual(model_type, UserModel)
+        self.assertEqual(form.data['about'], 'some data')
+        self.assertEqual(form.data['birthday'], datetime.now().date())
+        self.assertEqual(form.data['country'], 'Ukraine')
+        self.assertEqual(form.data['photo'], 'default_photo.png')
 
     def test_forms_invalid(self):
         """
