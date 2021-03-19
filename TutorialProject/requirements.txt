@@ -2,5 +2,5 @@ django==2.2.10
 pytz==2018.5
 selenium==3.13.0
 Pillow==6.2.0
-djangorestframework==3.9.1
+djangorestframework==3.11.2
 markdown==2.6.11
